@@ -75,7 +75,7 @@ export default function App() {
   const solution = useMemo(() => solveSlab(safeInput, phaseFraction), [safeInput, phaseFraction]);
   const losses = useMemo(() => computeLosses(solution), [solution]);
   const validations = useMemo(() => validateSolution(solution), [solution]);
-  const curve = useMemo(() => buildResistanceCurve(), []);
+  const curve = useMemo(() => buildResistanceCurve(solution.input.a / solution.delta), [solution.input.a, solution.delta]);
 
   const handleMaterialChange = (key: MaterialKey) => {
     setMaterial(key);
@@ -135,8 +135,8 @@ export default function App() {
       >
         <PhysicsFlow />
         <SkinDepthIndicator solution={solution} losses={losses} />
-        <ResistancePanel solution={solution} losses={losses} curve={curve} showLimits={showLimits} />
-        <FieldPlots solution={solution} normalized={normalized} />
+        <ResistancePanel solution={solution} losses={losses} showLimits={showLimits} />
+        <FieldPlots solution={solution} losses={losses} curve={curve} normalized={normalized} />
         <div className="visual-grid">
           <Suspense
             fallback={

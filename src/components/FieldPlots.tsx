@@ -1,5 +1,7 @@
+import { LossResults, ResistanceCurvePoint } from "../physics/loss";
 import { SlabSolution } from "../physics/slabModel";
 import { formatSci } from "../utils/format";
+import { ResistanceCurvePlot } from "./ResistanceCurvePlot";
 
 type Series = {
   x: number;
@@ -86,10 +88,12 @@ function Plot({ title, subtitle, data, color = "#5c2d91", yLabel, zeroLine }: Pl
 
 type FieldPlotsProps = {
   solution: SlabSolution;
+  losses: LossResults;
+  curve: ResistanceCurvePoint[];
   normalized: boolean;
 };
 
-export function FieldPlots({ solution, normalized }: FieldPlotsProps) {
+export function FieldPlots({ solution, losses, curve, normalized }: FieldPlotsProps) {
   const input = solution.input;
   const jdc = input.current > 0 ? input.current / (2 * input.a * input.b) : Math.max(...solution.points.map((point) => point.jAbs), 1);
   const maxHeat = Math.max(...solution.points.map((point) => point.heat), 1);
@@ -97,6 +101,7 @@ export function FieldPlots({ solution, normalized }: FieldPlotsProps) {
 
   return (
     <section className="plot-grid">
+      <ResistanceCurvePlot solution={solution} losses={losses} curve={curve} />
       <Plot
         title="电流密度幅值分布"
         subtitle={normalized ? "|Jz| / Jdc" : "RMS A/m²"}

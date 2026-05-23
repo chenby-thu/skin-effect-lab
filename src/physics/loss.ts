@@ -63,9 +63,17 @@ export const currentBalanceError = (solution: SlabSolution): number => {
   return abs(sub({ re: inet.re, im: inet.im }, { re: target, im: 0 })) / Math.max(target, TINY);
 };
 
-export const buildResistanceCurve = (samples = 140): { ratio: number; value: number }[] => {
-  const min = -2;
-  const max = 1.2;
+export type ResistanceCurvePoint = {
+  ratio: number;
+  value: number;
+};
+
+export const buildResistanceCurve = (currentRatio?: number, samples = 160): ResistanceCurvePoint[] => {
+  const minRatio = 0.01;
+  const baseMaxRatio = 10 ** 1.2;
+  const maxRatio = Math.max(baseMaxRatio, Number.isFinite(currentRatio ?? Number.NaN) ? (currentRatio ?? 0) * 1.2 : baseMaxRatio);
+  const min = Math.log10(minRatio);
+  const max = Math.log10(maxRatio);
   return Array.from({ length: samples }, (_, index) => {
     const ratio = 10 ** (min + ((max - min) * index) / (samples - 1));
     const solution = solveSlab(
@@ -85,4 +93,20 @@ export const buildResistanceCurve = (samples = 140): { ratio: number; value: num
     const losses = computeLosses(solution);
     return { ratio, value: losses.racOverRdc ?? Number.NaN };
   });
+};
+
+export const interpolateResistanceCurve = (curve: ResistanceCurvePoint[], ratio: number): number | null => {
+  if (curve.length < 2 || ratio <= 0 || !Number.isFinite(ratio)) return null;
+  const x = Math.log10(ratio);
+  for (let index = 1; index < curve.length; index += 1) {
+    const left = curve[index - 1];
+    const right = curve[index];
+    const leftX = Math.log10(left.ratio);
+    const rightX = Math.log10(right.ratio);
+    if (x >= leftX && x <= rightX) {
+      const fraction = (x - leftX) / (rightX - leftX || 1);
+      return left.value + (right.value - left.value) * fraction;
+    }
+  }
+  return null;
 };

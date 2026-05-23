@@ -355,7 +355,6 @@ input[type="checkbox"] {
 }
 
 .schematic-wrap svg {
-  min-width: 620px;
   width: 100%;
   display: block;
   background: #fbfcff;
@@ -388,19 +387,23 @@ input[type="checkbox"] {
 
 .schematic-label {
   fill: #526174;
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .schematic-boundary {
   fill: #007c89;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .schematic-core {
   fill: #172033;
-  font-size: 19px;
+  font-size: 16px;
   font-weight: 700;
+}
+
+.schematic-note {
+  font-size: 12.5px;
 }
 
 .derivation-grid {
@@ -531,6 +534,42 @@ input[type="checkbox"] {
 .plot-card svg {
   width: 100%;
   display: block;
+}
+
+.resistance-curve-card {
+  min-height: 252px;
+}
+
+.plot-note,
+.plot-warning,
+.plot-message {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.plot-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  color: #8a5a00;
+  background: #fff8e8;
+  border: 1px solid #f4d48a;
+  border-radius: 6px;
+  padding: 6px 7px;
+}
+
+.plot-message {
+  min-height: 185px;
+  display: grid;
+  place-items: center;
+  text-align: left;
+  color: #334155;
+  background: #fbfcff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 7px;
+  padding: 16px;
 }
 
 .plot-header {
