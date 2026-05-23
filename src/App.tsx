@@ -1,16 +1,22 @@
 import { lazy, Suspense, useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2, CircleAlert } from "lucide-react";
 import { AnimationPanel } from "./components/AnimationPanel";
 import { ControlPanel } from "./components/ControlPanel";
+import { DerivationPanel } from "./components/DerivationPanel";
 import { ExportPanel } from "./components/ExportPanel";
 import { FieldPlots } from "./components/FieldPlots";
-import { FormulaPanel } from "./components/FormulaPanel";
 import { HeatMap } from "./components/HeatMap";
 import { Layout } from "./components/Layout";
+import { ModelLimitsPanel } from "./components/ModelLimitsPanel";
+import { ModelSchematic } from "./components/ModelSchematic";
+import { PhysicsFlow } from "./components/PhysicsFlow";
+import { PresetScenarios } from "./components/PresetScenarios";
 import { ResistancePanel } from "./components/ResistancePanel";
+import { SkinDepthIndicator } from "./components/SkinDepthIndicator";
+import { ValidationPanel } from "./components/ValidationPanel";
 import { buildResistanceCurve, computeLosses } from "./physics/loss";
 import { MaterialKey, getMaterial } from "./physics/materials";
 import { ModelInput, solveSlab } from "./physics/slabModel";
+import { PresetScenario } from "./physics/teaching";
 import { validateSolution } from "./physics/validation";
 import { clamp } from "./utils/sampling";
 
@@ -50,31 +56,9 @@ function ExplanationPanel() {
         <p>趋肤深度 δ 是幅值下降到 1/e 的特征深度，同时相位也会随深度滞后。</p>
         <p>交流电阻不是预先给定的电路参数，而是由 J(x) 分布导致的损耗积分决定。</p>
         <p>同一个扩散方程，不同边界条件可以对应端子注入电流的集肤效应、外加磁场的涡流、外界磁场扰动下的一维邻近效应。</p>
+        <p>模式 C 用一维外加磁场扰动模拟邻近导体影响，只用于观察左右不对称分布，不等同于完整多导体仿真。</p>
         <p>强集肤近似不能滥用，必须检查 a/δ 是否足够大。</p>
         <p>高 μ 或高 σ 会让 δ 变小，磁场更难进入导体，集肤效应更强。</p>
-      </div>
-    </section>
-  );
-}
-
-function ValidationPanel({ items }: { items: ReturnType<typeof validateSolution> }) {
-  const icon = {
-    pass: <CheckCircle2 size={17} />,
-    warn: <AlertTriangle size={17} />,
-    fail: <CircleAlert size={17} />,
-  };
-
-  return (
-    <section className="panel">
-      <h2>模型校验</h2>
-      <div className="validation-list">
-        {items.map((item) => (
-          <div key={item.label} className={`validation-item ${item.status}`}>
-            {icon[item.status]}
-            <strong>{item.label}</strong>
-            <span>{item.detail}</span>
-          </div>
-        ))}
       </div>
     </section>
   );
@@ -105,6 +89,21 @@ export default function App() {
     setInput((previous) => sanitizeInput({ ...previous, ...next }));
   };
 
+  const handlePresetApply = (scenario: PresetScenario) => {
+    const selected = getMaterial(scenario.material);
+    setMaterial(scenario.material);
+    setInput((previous) =>
+      sanitizeInput({
+        ...previous,
+        sigma: selected.sigma,
+        muR: selected.muR,
+        ...scenario.input,
+      }),
+    );
+    setShowLimits(true);
+    setPhaseFraction(0);
+  };
+
   return (
     <>
       <header className="hero">
@@ -117,20 +116,25 @@ export default function App() {
 
       <Layout
         sidebar={
-          <ControlPanel
-            input={safeInput}
-            material={material}
-            normalized={normalized}
-            showLimits={showLimits}
-            phaseFraction={phaseFraction}
-            onInputChange={handleInputChange}
-            onMaterialChange={handleMaterialChange}
-            onNormalizedChange={setNormalized}
-            onShowLimitsChange={setShowLimits}
-            onPhaseChange={setPhaseFraction}
-          />
+          <>
+            <PresetScenarios onApply={handlePresetApply} />
+            <ControlPanel
+              input={safeInput}
+              material={material}
+              normalized={normalized}
+              showLimits={showLimits}
+              phaseFraction={phaseFraction}
+              onInputChange={handleInputChange}
+              onMaterialChange={handleMaterialChange}
+              onNormalizedChange={setNormalized}
+              onShowLimitsChange={setShowLimits}
+              onPhaseChange={setPhaseFraction}
+            />
+          </>
         }
       >
+        <PhysicsFlow />
+        <SkinDepthIndicator solution={solution} losses={losses} />
         <ResistancePanel solution={solution} losses={losses} curve={curve} showLimits={showLimits} />
         <FieldPlots solution={solution} normalized={normalized} />
         <div className="visual-grid">
@@ -147,10 +151,12 @@ export default function App() {
           <AnimationPanel solution={solution} normalized={normalized} />
           <HeatMap solution={solution} />
         </div>
-        <FormulaPanel />
+        <ModelSchematic />
+        <DerivationPanel />
         <ExplanationPanel />
+        <ModelLimitsPanel mode={safeInput.mode} />
         <ValidationPanel items={validations} />
-        <ExportPanel solution={solution} losses={losses} />
+        <ExportPanel solution={solution} losses={losses} material={material} validations={validations} />
       </Layout>
     </>
   );

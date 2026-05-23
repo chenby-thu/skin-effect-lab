@@ -1,6 +1,7 @@
 import { SlidersHorizontal } from "lucide-react";
 import { MATERIALS, MaterialKey, getMaterial } from "../physics/materials";
 import { Mode, ModelInput } from "../physics/slabModel";
+import { modeCApproximation, modeDescriptions } from "../physics/teaching";
 import { formatSci } from "../utils/format";
 import { logToValue, valueToLog } from "../utils/sampling";
 
@@ -137,6 +138,10 @@ export function ControlPanel({
           ))}
         </select>
       </label>
+      <p className="mode-note">
+        {modeDescriptions[input.mode]}
+        {input.mode === "C" ? ` ${modeCApproximation}` : ""}
+      </p>
 
       <label>
         采样点数 N: {input.samples}
