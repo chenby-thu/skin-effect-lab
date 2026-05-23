@@ -9,8 +9,8 @@ export function AnimationPanel({ solution, normalized }: AnimationPanelProps) {
   const maxAbs = Math.max(...solution.points.map((point) => Math.abs(point.instantJ)), 1e-30);
   const data = solution.points.map((point) => ({ x: point.xOverA, y: normalized ? point.instantJ / maxAbs : point.instantJ }));
   const width = 720;
-  const height = 250;
-  const pad = { left: 56, right: 18, top: 28, bottom: 38 };
+  const height = 210;
+  const pad = { left: 54, right: 16, top: 24, bottom: 34 };
   const yVals = data.map((point) => point.y);
   const rawMin = Math.min(...yVals, -1);
   const rawMax = Math.max(...yVals, 1);

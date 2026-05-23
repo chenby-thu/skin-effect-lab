@@ -16,8 +16,8 @@ type PlotProps = {
 };
 
 const width = 460;
-const height = 230;
-const pad = { left: 52, right: 18, top: 26, bottom: 36 };
+const height = 185;
+const pad = { left: 50, right: 16, top: 22, bottom: 31 };
 
 function pathFromData(data: Series[], yMin: number, yMax: number) {
   const xScale = (x: number) => pad.left + ((x + 1) / 2) * (width - pad.left - pad.right);

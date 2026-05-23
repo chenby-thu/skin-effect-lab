@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, CircleAlert } from "lucide-react";
 import { AnimationPanel } from "./components/AnimationPanel";
 import { ControlPanel } from "./components/ControlPanel";
@@ -25,6 +25,10 @@ const defaultInput: ModelInput = {
   mode: "A",
   samples: 400,
 };
+
+const ThreeScenePanel = lazy(() =>
+  import("./components/ThreeScenePanel").then((module) => ({ default: module.ThreeScenePanel })),
+);
 
 const sanitizeInput = (input: ModelInput): ModelInput => ({
   ...input,
@@ -129,8 +133,20 @@ export default function App() {
       >
         <ResistancePanel solution={solution} losses={losses} curve={curve} showLimits={showLimits} />
         <FieldPlots solution={solution} normalized={normalized} />
-        <AnimationPanel solution={solution} normalized={normalized} />
-        <HeatMap solution={solution} />
+        <div className="visual-grid">
+          <Suspense
+            fallback={
+              <section className="panel three-panel">
+                <h2>三维直观展示</h2>
+                <div className="three-loading">正在加载三维视图...</div>
+              </section>
+            }
+          >
+            <ThreeScenePanel solution={solution} />
+          </Suspense>
+          <AnimationPanel solution={solution} normalized={normalized} />
+          <HeatMap solution={solution} />
+        </div>
         <FormulaPanel />
         <ExplanationPanel />
         <ValidationPanel items={validations} />
