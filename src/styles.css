@@ -256,8 +256,36 @@ input[type="checkbox"] {
 }
 
 .compact-flow {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   align-items: stretch;
+  gap: 10px 18px;
+  grid-auto-rows: 1fr;
+}
+
+.flow-node {
+  position: relative;
+  min-width: 0;
+  display: grid;
+}
+
+.flow-link-arrow {
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  width: 13px;
+  height: 1px;
+  background: #c9d2df;
+  transform: translateY(-50%);
+}
+
+.flow-link-arrow::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: -3px;
+  border-left: 5px solid #c9d2df;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
 }
 
 .flow-step-wrap {
@@ -287,16 +315,24 @@ input[type="checkbox"] {
 }
 
 .compact-step {
-  min-height: 82px;
-  padding: 8px 9px;
+  min-height: 112px;
+  height: 100%;
+  padding: 9px;
+  grid-template-rows: auto auto 1fr auto;
+  align-content: stretch;
 }
 
-.compact-step span {
+.compact-step .flow-meaning {
+  display: inline-flex;
+  align-items: center;
   width: auto;
   height: auto;
   min-width: 0;
   padding: 2px 6px;
   border-radius: 999px;
+  background: #f0ebf8;
+  color: var(--thu-purple-dark);
+  font-weight: 700;
   max-width: none;
   justify-self: start;
   overflow: visible;
@@ -304,16 +340,37 @@ input[type="checkbox"] {
   white-space: nowrap;
   font-size: 0.72rem;
   line-height: 1.2;
+  min-height: 22px;
 }
 
 .compact-step strong {
-  font-size: 0.84rem;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  font-size: 0.82rem;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
 .compact-step p {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
   font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.flow-note {
+  align-self: end;
+  color: #6b5b7d;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.compact-step .regime-badge {
+  align-self: end;
 }
 
 .regime-badge {
@@ -1053,7 +1110,7 @@ button:hover {
   }
 
   .compact-flow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .flow-step-wrap,
@@ -1062,6 +1119,10 @@ button:hover {
   }
 
   .flow-arrow {
+    display: none;
+  }
+
+  .flow-node:nth-child(4n) .flow-link-arrow {
     display: none;
   }
 
@@ -1096,6 +1157,10 @@ button:hover {
 
   .compact-flow {
     grid-template-columns: 1fr;
+  }
+
+  .flow-link-arrow {
+    display: none;
   }
 
   .two-controls,
