@@ -5,8 +5,8 @@ const formulas = [
   "Jz = dHy/dx",
   "q''' = |Jrms|²/σ",
   "Pac' = b/σ ∫ |Jrms|² dx",
-  "Rac' = Pac'/Irms²",
-  "Rdc' = 1/(σ·2ab)",
+  "R_ac' = P_ac'/I_rms²",
+  "R_dc' = 1/(σ·2ab)",
 ];
 
 export function FormulaPanel() {

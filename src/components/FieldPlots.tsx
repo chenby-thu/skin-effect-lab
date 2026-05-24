@@ -146,7 +146,7 @@ function ProbePanel({ solution }: { solution: SlabSolution }) {
       </label>
       <div className="probe-grid">
         <span>x/a <strong>{point.xOverA.toFixed(3)}</strong></span>
-        <span>s/delta <strong>{formatSci(sOverDelta, 3)}</strong></span>
+        <span>s/δ <strong>{formatSci(sOverDelta, 3)}</strong></span>
         <span>|H_y| <strong>{formatSci(point.hyAbs)}</strong></span>
         <span>phase(H_y) <strong>{formatPhase(point.hyPhase)}</strong></span>
         <span>|J_z| <strong>{formatSci(point.jAbs)}</strong></span>
@@ -193,7 +193,7 @@ function SurfaceZoom({ solution, display }: { solution: SlabSolution; display: D
     <article className="plot-card surface-zoom-card">
       <div className="plot-header">
         <h3>表面层放大</h3>
-        <span>s/delta, 0 到 8</span>
+        <span>s/δ, 0 到 8</span>
       </div>
       <div className="surface-legend">
         {showLeft ? <span className="legend-j">左 |J|</span> : null}
@@ -224,13 +224,13 @@ function SurfaceZoom({ solution, display }: { solution: SlabSolution; display: D
         {showLeft ? <path d={pathFromData(leftHeat, yMin, plotYMax, 0, 8, logScale)} fill="none" stroke="#ba4a00" strokeWidth="1.8" strokeDasharray="4 4" /> : null}
         {showRight ? <path d={pathFromData(rightHeat, yMin, plotYMax, 0, 8, logScale)} fill="none" stroke="#d97706" strokeWidth="1.8" strokeDasharray="4 4" /> : null}
         <text x={(pad.left + width - pad.right) / 2} y={height - 2} textAnchor="middle" className="axis-label">
-          s/delta
+          s/δ
         </text>
         <text x={14} y={(height - pad.bottom + pad.top) / 2} textAnchor="middle" className="axis-label rotate-label">
           {normalized ? "normalized" : "absolute"}
         </text>
       </svg>
-      {solution.input.a / solution.delta > 5 ? <p className="plot-note">强集肤: 主要变化集中在约 1~3 个 delta 内。</p> : null}
+      {solution.input.a / solution.delta > 5 ? <p className="plot-note">强集肤: 主要变化集中在约 1~3 个 δ 内。</p> : null}
     </article>
   );
 }

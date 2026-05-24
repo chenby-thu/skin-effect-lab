@@ -50,8 +50,8 @@ export function ResistanceCurvePlot({ solution, losses, curve }: ResistanceCurve
     currentX >= pad.left - 0.1 &&
     currentX <= width - pad.right + 0.1;
 
-  const title = mode === "A" ? "纯集肤 R_ac/R_dc 曲线" : mode === "C" ? "纯 A 曲线参考" : "涡流损耗模式";
-  const subtitle = mode === "A" ? "当前点应在线上" : mode === "C" ? "当前点为等效损耗" : "R_ac 不定义";
+  const title = mode === "A" ? "纯集肤 R_ac/R_dc 曲线" : mode === "C" ? "纯 Mode A 曲线参考" : "涡流损耗模式";
+  const subtitle = mode === "A" ? "端子电流定义" : mode === "C" ? "等效损耗指标" : "R_ac 不定义";
 
   return (
     <article className="plot-card resistance-curve-card">
@@ -100,16 +100,16 @@ export function ResistanceCurvePlot({ solution, losses, curve }: ResistanceCurve
               </g>
             ) : null}
             <text x={(pad.left + width - pad.right) / 2} y={height - 2} textAnchor="middle" className="axis-label">
-              a/delta
+              a/δ
             </text>
             <text x={14} y={(height - pad.bottom + pad.top) / 2} textAnchor="middle" className="axis-label rotate-label">
-              R/Rdc
+              R/R_dc
             </text>
           </svg>
           <p className="plot-note">
             {mode === "C"
-              ? "模式 C 当前点为等效损耗，含外场诱发涡流与端子电流叠加；偏离纯 A 曲线是物理结果。"
-              : `当前 a/delta = ${formatSci(ratio, 3)}。曲线与当前点使用同一 P'=b/sigma ∫|J|^2 dx 定义。`}
+              ? "Mode C 当前点为等效损耗，含外场诱发涡流与端子电流叠加；偏离纯 Mode A 曲线是物理结果。"
+              : `当前 a/δ = ${formatSci(ratio, 3)}。曲线与当前点使用同一 P'=b/σ ∫|J|² dx 定义。`}
           </p>
           {shouldWarn ? (
             <p className="plot-warning">

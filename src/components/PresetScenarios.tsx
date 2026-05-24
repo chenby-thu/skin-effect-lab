@@ -10,7 +10,7 @@ export function PresetScenarios({ onApply }: PresetScenariosProps) {
     <section className="panel preset-panel" aria-labelledby="preset-title">
       <div className="panel-title">
         <Sparkles size={18} />
-        <h2 id="preset-title">实验场景</h2>
+        <h2 id="preset-title">典型参数场景</h2>
       </div>
       <div className="preset-grid">
         {presetScenarios.map((scenario) => (

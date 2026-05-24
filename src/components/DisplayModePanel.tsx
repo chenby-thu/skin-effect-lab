@@ -80,7 +80,7 @@ export function DisplayModePanel({ options, onChange }: DisplayModePanelProps) {
       />
       <p className="tiny-note display-note">
         <ScanSearch size={14} />
-        a/delta &gt; 5 时优先看表面放大，主要变化集中在约 1~3 个 delta 内。
+        a/δ &gt; 5 时优先看表面放大，主要变化集中在约 1~3 个 δ 内。
       </p>
     </section>
   );

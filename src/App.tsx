@@ -55,9 +55,9 @@ function ExplanationPanel() {
       <summary>公式与假设</summary>
       <div className="explain-grid">
         <p>集肤效应来自磁扩散方程导致的连续电流重分布。</p>
-        <p>delta 是磁场和电流幅值衰减的特征深度，强集肤时主要变化集中在少数几个 delta 内。</p>
-        <p>模式 A 的 R_ac 由 P'=b/sigma ∫|J_rms|^2 dx 与 I_rms^2 定义。</p>
-        <p>模式 B 无端子净传输电流，只报告涡流损耗；模式 C 报告等效损耗和外场扰动趋势。</p>
+        <p>趋肤深度 δ 是时变场进入导体的特征深度。</p>
+        <p>Mode A 的 R_ac 由 P'=b/σ ∫|J_rms|² dx 与 I_rms² 定义。</p>
+        <p>Mode B 只报告涡流损耗；Mode C 是外场扰动下的一维邻近效应近似。</p>
       </div>
     </details>
   );
@@ -118,8 +118,8 @@ export default function App() {
       <header className="hero">
         <div>
           <span className="course-tag">电磁场课程可视化微作品</span>
-          <h1>从磁扩散到交流损耗</h1>
-          <p>集肤效应、涡流损耗与外磁场扰动的一维实验台</p>
+          <h1>从磁扩散方程到交流电阻</h1>
+          <p>集肤效应、涡流损耗与一维邻近效应近似的交互式可视化</p>
         </div>
       </header>
 
@@ -149,8 +149,8 @@ export default function App() {
           <Suspense
             fallback={
               <section className="panel three-panel">
-                <h2>三维直观展示</h2>
-                <div className="three-loading">正在加载三维视图...</div>
+                <h2>三维示意：电流密度与热源分布</h2>
+                <div className="three-loading">正在加载三维示意...</div>
               </section>
             }
           >

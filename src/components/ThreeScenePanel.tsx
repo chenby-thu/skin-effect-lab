@@ -139,8 +139,8 @@ export function ThreeScenePanel({ solution }: ThreeScenePanelProps) {
 
   return (
     <section className="panel three-panel">
-      <h2>三维直观展示</h2>
-      <p className="panel-subtitle">平板厚度方向按热源着色，电流密度用沿 z 方向的箭头表示。</p>
+      <h2>三维示意：电流密度与热源分布</h2>
+      <p className="panel-subtitle">平板厚度方向按 q''' 着色，J_z 用沿 z 方向的箭头示意；这不是三维 FEM 仿真。</p>
       <div ref={hostRef} className="three-host" aria-label="三维导体板热源与电流密度示意图" />
     </section>
   );

@@ -15,7 +15,7 @@ export function HeatMap({ solution }: HeatMapProps) {
   const maxHeat = Math.max(...solution.points.map((point) => point.heat), 1e-30);
   return (
     <section className="panel heat-panel">
-      <h2>热源分布色条</h2>
+      <h2>焦耳热源分布 q'''</h2>
       <div className="heat-strip" role="img" aria-label="单位体积热源沿厚度方向分布">
         {solution.points.map((point, index) => (
           <span

@@ -11,7 +11,7 @@ export function ModelLimitsPanel({ mode }: ModelLimitsPanelProps) {
     <details className="panel limits-panel compact-details" aria-labelledby="limits-title">
       <summary id="limits-title">
         <AlertTriangle size={17} />
-        模型边界
+        模型假设与适用边界
       </summary>
       {mode === "C" ? <p className="mode-c-note">{modeCApproximation}</p> : null}
       <div className="limits-list">

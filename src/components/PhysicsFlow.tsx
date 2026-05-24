@@ -25,14 +25,14 @@ export function PhysicsFlow({ solution, losses }: PhysicsFlowProps) {
     input.mode === "B"
       ? {
           meaning: "涡流损耗",
-          formula: "P′eddy",
+          formula: "P′_eddy",
           value: `${formatSci(losses.pac)} W/m`,
           note: "无端子电流, R_ac 不定义",
         }
       : input.mode === "C"
         ? {
             meaning: "总损耗",
-            formula: "P′total → R_eq/R_dc",
+            formula: "P′_total → R_eq/R_dc",
             value: losses.racOverRdc === null ? "未定义" : formatSci(losses.racOverRdc, 3),
             note: "等效损耗",
           }
@@ -44,7 +44,7 @@ export function PhysicsFlow({ solution, losses }: PhysicsFlowProps) {
 
   const steps: Step[] = [
     { meaning: "角频率", formula: "ω = 2πf", value: `${formatSci(2 * Math.PI * input.frequency)} rad/s` },
-    { meaning: "材料与尺寸", formula: "μ, σ, a", value: `μr=${formatSci(input.muR)}, a=${formatMm(input.a)}` },
+    { meaning: "材料与尺寸", formula: "μ, σ, a", value: `μ_r=${formatSci(input.muR)}, σ=${formatSci(input.sigma)}` },
     { meaning: "扩散深度", formula: "δ = √(2/(ωμσ))", value: formatMm(solution.delta) },
     { meaning: "集肤强度", formula: "a/δ", value: formatSci(ratio, 3), note: regime.title },
     { meaning: "磁场剖面", formula: "H_y(x)", value: `max |H|=${formatSci(maxHy)}` },

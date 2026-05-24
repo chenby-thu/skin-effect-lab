@@ -60,7 +60,7 @@ export const validateSolution = (solution: SlabSolution): ValidationItem[] => {
       items.push({
         label: "模式 A: 低频极限",
         status: statusByError(lowFrequencyError, 5e-3, 3e-2),
-        detail: `a/delta = ${ratio.toFixed(4)}，R_ac/R_dc 应接近 1`,
+        detail: `a/δ = ${ratio.toFixed(4)}，R_ac/R_dc 应接近 1`,
       });
     }
 
@@ -68,7 +68,7 @@ export const validateSolution = (solution: SlabSolution): ValidationItem[] => {
       items.push({
         label: "模式 A: 强集肤趋势",
         status: losses.racOverRdc > 1.1 ? "pass" : "warn",
-        detail: `a/delta = ${ratio.toFixed(2)}，R_ac/R_dc = ${losses.racOverRdc.toFixed(3)}`,
+        detail: `a/δ = ${ratio.toFixed(2)}，R_ac/R_dc = ${losses.racOverRdc.toFixed(3)}`,
       });
     }
 
@@ -131,7 +131,7 @@ export const validateSolution = (solution: SlabSolution): ValidationItem[] => {
     items.push({
       label: "模式 C: 左右不对称指标",
       status: losses.asymmetryIndex > 0.03 ? "pass" : "warn",
-      detail: `asymmetry index = ${losses.asymmetryIndex.toExponential(2)}`,
+      detail: `不对称指标 = ${losses.asymmetryIndex.toExponential(2)}`,
     });
 
     items.push({

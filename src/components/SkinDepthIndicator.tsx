@@ -14,8 +14,8 @@ export function SkinDepthIndicator({ solution, losses }: SkinDepthIndicatorProps
   const regime = classifySkinRegime(ratio);
   const modeMetric =
     solution.input.mode === "B"
-      ? `P_eddy' = ${formatSci(losses.pac)} W/m`
-      : `${solution.input.mode === "C" ? "Req/Rdc" : "Rac/Rdc"} = ${
+      ? `P'_eddy = ${formatSci(losses.pac)} W/m`
+      : `${solution.input.mode === "C" ? "R_eq/R_dc" : "R_ac/R_dc"} = ${
           losses.racOverRdc === null ? "未定义" : formatSci(losses.racOverRdc, 4)
         }`;
 
@@ -23,15 +23,15 @@ export function SkinDepthIndicator({ solution, losses }: SkinDepthIndicatorProps
     <section className={`panel skin-indicator ${regime.key}`} aria-labelledby="skin-indicator-title">
       <div className="panel-title">
         <Gauge size={18} />
-        <h2 id="skin-indicator-title">delta 与集肤强度</h2>
+        <h2 id="skin-indicator-title">趋肤深度 δ 与集肤强度</h2>
       </div>
       <div className="skin-indicator-grid">
         <div className="skin-big-metric">
-          <span>趋肤深度 delta</span>
+          <span>趋肤深度 δ</span>
           <strong>{formatMm(solution.delta)}</strong>
         </div>
         <div className="skin-big-metric emphasis">
-          <span>a/delta</span>
+          <span>a/δ</span>
           <strong>{formatSci(ratio, 4)}</strong>
           <small>{regime.title}</small>
         </div>
@@ -43,7 +43,7 @@ export function SkinDepthIndicator({ solution, losses }: SkinDepthIndicatorProps
         <div className="skin-regime">
           <span>模式指标</span>
           <strong>{modeMetric}</strong>
-          <p>{solution.input.mode === "B" ? "无端子电流，改看涡流损耗。" : "由 J_z(x) 的焦耳热积分得到。"}</p>
+          <p>{solution.input.mode === "B" ? "无端子电流，不定义端子 R_ac。" : "由 J_z(x) 的焦耳热积分得到。"}</p>
         </div>
       </div>
     </section>

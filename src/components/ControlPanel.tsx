@@ -17,9 +17,9 @@ type ControlPanelProps = {
 };
 
 const modeLabels: Record<Mode, string> = {
-  A: "A 端子注入电流",
-  B: "B 外加磁场涡流",
-  C: "C 注入 + 外磁场",
+  A: "A 注入电流: 集肤效应与交流电阻",
+  B: "B 外加时变磁场: 涡流损耗",
+  C: "C 注入电流 + 外场扰动: 一维邻近效应近似",
 };
 
 export function ControlPanel({
@@ -54,7 +54,7 @@ export function ControlPanel({
 
       <div className="two-controls">
         <label>
-          电导率 sigma (S/m)
+          电导率 σ (S/m)
           <input
             type="number"
             min="1000"
@@ -67,7 +67,7 @@ export function ControlPanel({
         </label>
 
         <label>
-          相对磁导率 mu_r
+          相对磁导率 μ_r
           <input
             type="number"
             min="1"
@@ -123,7 +123,7 @@ export function ControlPanel({
         </label>
 
         <label>
-          外加磁场 H0,rms (A/m)
+          {"外加磁场 H_{0,rms} (A/m)"}
           <input type="number" value={input.h0} onChange={(event) => setNumber("h0", Number(event.target.value))} />
         </label>
       </div>
@@ -159,7 +159,7 @@ export function ControlPanel({
         显示理论极限提示
       </label>
 
-      <p className="tiny-note">材料基准: sigma = {formatSci(getMaterial(material).sigma)} S/m, mu_r = {getMaterial(material).muR}</p>
+      <p className="tiny-note">材料基准: σ = {formatSci(getMaterial(material).sigma)} S/m, μ_r = {getMaterial(material).muR}</p>
     </section>
   );
 }
