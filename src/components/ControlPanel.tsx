@@ -1,19 +1,17 @@
 import { SlidersHorizontal } from "lucide-react";
 import { MATERIALS, MaterialKey, getMaterial } from "../physics/materials";
 import { Mode, ModelInput } from "../physics/slabModel";
-import { modeCApproximation, modeDescriptions } from "../physics/teaching";
+import { boundaryFormula, modeCApproximation, modeDescriptions } from "../physics/teaching";
 import { formatSci } from "../utils/format";
 import { logToValue, valueToLog } from "../utils/sampling";
 
 type ControlPanelProps = {
   input: ModelInput;
   material: MaterialKey;
-  normalized: boolean;
   showLimits: boolean;
   phaseFraction: number;
   onInputChange: (next: Partial<ModelInput>) => void;
   onMaterialChange: (key: MaterialKey) => void;
-  onNormalizedChange: (value: boolean) => void;
   onShowLimitsChange: (value: boolean) => void;
   onPhaseChange: (value: number) => void;
 };
@@ -27,12 +25,10 @@ const modeLabels: Record<Mode, string> = {
 export function ControlPanel({
   input,
   material,
-  normalized,
   showLimits,
   phaseFraction,
   onInputChange,
   onMaterialChange,
-  onNormalizedChange,
   onShowLimitsChange,
   onPhaseChange,
 }: ControlPanelProps) {
@@ -56,31 +52,33 @@ export function ControlPanel({
         </select>
       </label>
 
-      <label>
-        电导率 σ (S/m)
-        <input
-          type="number"
-          min="1000"
-          value={input.sigma}
-          onChange={(event) => {
-            onMaterialChange("custom");
-            setNumber("sigma", Number(event.target.value));
-          }}
-        />
-      </label>
+      <div className="two-controls">
+        <label>
+          电导率 sigma (S/m)
+          <input
+            type="number"
+            min="1000"
+            value={input.sigma}
+            onChange={(event) => {
+              onMaterialChange("custom");
+              setNumber("sigma", Number(event.target.value));
+            }}
+          />
+        </label>
 
-      <label>
-        相对磁导率 μr
-        <input
-          type="number"
-          min="1"
-          value={input.muR}
-          onChange={(event) => {
-            onMaterialChange("custom");
-            setNumber("muR", Number(event.target.value));
-          }}
-        />
-      </label>
+        <label>
+          相对磁导率 mu_r
+          <input
+            type="number"
+            min="1"
+            value={input.muR}
+            onChange={(event) => {
+              onMaterialChange("custom");
+              setNumber("muR", Number(event.target.value));
+            }}
+          />
+        </label>
+      </div>
 
       <label>
         频率 f: {formatSci(input.frequency)} Hz
@@ -118,15 +116,17 @@ export function ControlPanel({
         />
       </label>
 
-      <label>
-        注入电流 Irms (A)
-        <input type="number" min="0" value={input.current} onChange={(event) => setNumber("current", Number(event.target.value))} />
-      </label>
+      <div className="two-controls">
+        <label>
+          注入电流 I_rms (A)
+          <input type="number" min="0" value={input.current} onChange={(event) => setNumber("current", Number(event.target.value))} />
+        </label>
 
-      <label>
-        外加磁场 H0,rms (A/m)
-        <input type="number" value={input.h0} onChange={(event) => setNumber("h0", Number(event.target.value))} />
-      </label>
+        <label>
+          外加磁场 H0,rms (A/m)
+          <input type="number" value={input.h0} onChange={(event) => setNumber("h0", Number(event.target.value))} />
+        </label>
+      </div>
 
       <label>
         模式选择
@@ -138,10 +138,11 @@ export function ControlPanel({
           ))}
         </select>
       </label>
-      <p className="mode-note">
-        {modeDescriptions[input.mode]}
-        {input.mode === "C" ? ` ${modeCApproximation}` : ""}
-      </p>
+      <div className="mode-note">
+        <p>{modeDescriptions[input.mode]}</p>
+        {input.mode === "C" ? <p>{modeCApproximation}</p> : null}
+        <code>{boundaryFormula(input.mode)}</code>
+      </div>
 
       <label>
         采样点数 N: {input.samples}
@@ -153,18 +154,12 @@ export function ControlPanel({
         <input type="range" min="0" max="1" step="0.005" value={phaseFraction} onChange={(event) => onPhaseChange(Number(event.target.value))} />
       </label>
 
-      <div className="switch-row">
-        <label className="checkbox-label">
-          <input type="checkbox" checked={normalized} onChange={(event) => onNormalizedChange(event.target.checked)} />
-          显示归一化结果
-        </label>
-        <label className="checkbox-label">
-          <input type="checkbox" checked={showLimits} onChange={(event) => onShowLimitsChange(event.target.checked)} />
-          显示理论极限提示
-        </label>
-      </div>
+      <label className="checkbox-label">
+        <input type="checkbox" checked={showLimits} onChange={(event) => onShowLimitsChange(event.target.checked)} />
+        显示理论极限提示
+      </label>
 
-      <p className="tiny-note">当前材料基准：σ = {formatSci(getMaterial(material).sigma)} S/m, μr = {getMaterial(material).muR}</p>
+      <p className="tiny-note">材料基准: sigma = {formatSci(getMaterial(material).sigma)} S/m, mu_r = {getMaterial(material).muR}</p>
     </section>
   );
 }

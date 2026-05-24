@@ -6,13 +6,14 @@ import {
   cosh,
   div,
   exp,
+  finiteOrZero,
   mul,
   scale,
   sinh,
   sub,
 } from "./complex";
 import { propagationGamma, skinDepth } from "./skinDepth";
-import { linspace } from "../utils/sampling";
+import { generateSmartMesh } from "../utils/sampling";
 
 export type Mode = "A" | "B" | "C";
 
@@ -52,6 +53,7 @@ export type SlabSolution = {
   gamma: Complex;
   boundaries: BoundaryConditions;
   points: SamplePoint[];
+  integrationPoints: SamplePoint[];
 };
 
 export const boundaryConditions = (input: ModelInput): BoundaryConditions => {
@@ -71,7 +73,7 @@ const sinhOverSinh = (gamma: Complex, y: number, total: number): Complex => {
   const leading = exp(sub(gy, gTotal));
   const top = sub(C(1, 0), exp(scale(gy, -2)));
   const bottom = sub(C(1, 0), exp(scale(gTotal, -2)));
-  return mul(leading, div(top, bottom));
+  return finiteOrZero(mul(leading, div(top, bottom)));
 };
 
 const coshOverSinh = (gamma: Complex, y: number, total: number): Complex => {
@@ -82,7 +84,7 @@ const coshOverSinh = (gamma: Complex, y: number, total: number): Complex => {
   const leading = exp(sub(gy, gTotal));
   const top = add(C(1, 0), exp(scale(gy, -2)));
   const bottom = sub(C(1, 0), exp(scale(gTotal, -2)));
-  return mul(leading, div(top, bottom));
+  return finiteOrZero(mul(leading, div(top, bottom)));
 };
 
 export const solveAt = (
@@ -96,14 +98,14 @@ export const solveAt = (
   const total = 2 * a;
   const leftY = a - x;
   const rightY = x + a;
-  const leftH = scale(sinhOverSinh(gamma, leftY, total), boundaries.hl.re);
-  const rightH = scale(sinhOverSinh(gamma, rightY, total), boundaries.hr.re);
+  const leftH = scale(finiteOrZero(sinhOverSinh(gamma, leftY, total)), boundaries.hl.re);
+  const rightH = scale(finiteOrZero(sinhOverSinh(gamma, rightY, total)), boundaries.hr.re);
   const hy = add(leftH, rightH);
 
-  const leftJ = scale(mul(gamma, coshOverSinh(gamma, leftY, total)), -boundaries.hl.re);
-  const rightJ = scale(mul(gamma, coshOverSinh(gamma, rightY, total)), boundaries.hr.re);
+  const leftJ = scale(finiteOrZero(mul(gamma, coshOverSinh(gamma, leftY, total))), -boundaries.hl.re);
+  const rightJ = scale(finiteOrZero(mul(gamma, coshOverSinh(gamma, rightY, total))), boundaries.hr.re);
   const jz = add(leftJ, rightJ);
-  const jAbs = abs(jz);
+  const jAbs = Number.isFinite(abs(jz)) ? abs(jz) : 0;
 
   return {
     x,
@@ -124,7 +126,9 @@ export const solveSlab = (input: ModelInput, phaseFraction = 0): SlabSolution =>
   const gamma = propagationGamma(delta);
   const boundaries = boundaryConditions(input);
   const phase = 2 * Math.PI * phaseFraction;
-  const xs = linspace(-input.a, input.a, input.samples);
+  const xs = generateSmartMesh(input.a, delta, "display", input.samples);
+  const integrationXs = generateSmartMesh(input.a, delta, "integration", Math.max(input.samples, 1200));
   const points = xs.map((x) => solveAt(x, input.a, gamma, boundaries, input.sigma, phase));
-  return { input, delta, gamma, boundaries, points };
+  const integrationPoints = integrationXs.map((x) => solveAt(x, input.a, gamma, boundaries, input.sigma, phase));
+  return { input, delta, gamma, boundaries, points, integrationPoints };
 };

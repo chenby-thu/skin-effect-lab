@@ -8,7 +8,7 @@ type ThreeScenePanelProps = {
 
 const heatColor = (ratio: number) => {
   const t = Math.max(0, Math.min(1, ratio));
-  return new THREE.Color().setHSL(0.72 - 0.72 * t, 0.78, 0.34 + 0.18 * t);
+  return new THREE.Color().setHSL(0.58 - 0.52 * t, 0.72, 0.42 + 0.12 * t);
 };
 
 export function ThreeScenePanel({ solution }: ThreeScenePanelProps) {
@@ -42,9 +42,9 @@ export function ThreeScenePanel({ solution }: ThreeScenePanelProps) {
     const slabLength = 4.6;
     const slabWidth = 1.15;
 
-    for (let i = 0; i < segments; i += 1) {
-      const p0 = solution.points[Math.floor((i / segments) * (solution.points.length - 1))];
-      const p1 = solution.points[Math.floor(((i + 1) / segments) * (solution.points.length - 1))];
+    for (let index = 0; index < segments; index += 1) {
+      const p0 = solution.points[Math.floor((index / segments) * (solution.points.length - 1))];
+      const p1 = solution.points[Math.floor(((index + 1) / segments) * (solution.points.length - 1))];
       const x0 = p0.xOverA;
       const x1 = p1.xOverA;
       const centerX = ((x0 + x1) / 2) * (slabLength / 2);
@@ -68,9 +68,9 @@ export function ThreeScenePanel({ solution }: ThreeScenePanelProps) {
     const arrowMaterial = new THREE.MeshStandardMaterial({ color: "#172033", roughness: 0.4 });
     const arrowCount = 9;
     const maxJ = Math.max(...solution.points.map((point) => point.jAbs), 1e-30);
-    for (let i = 0; i < arrowCount; i += 1) {
-      const index = Math.round((i / (arrowCount - 1)) * (solution.points.length - 1));
-      const point = solution.points[index];
+    for (let index = 0; index < arrowCount; index += 1) {
+      const pointIndex = Math.round((index / (arrowCount - 1)) * (solution.points.length - 1));
+      const point = solution.points[pointIndex];
       const x = point.xOverA * (slabLength / 2);
       const length = 0.32 + 0.88 * (point.jAbs / maxJ);
       const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, length, 16), arrowMaterial);
@@ -93,8 +93,8 @@ export function ThreeScenePanel({ solution }: ThreeScenePanelProps) {
     if (ctx) {
       ctx.fillStyle = "#172033";
       ctx.font = "28px Segoe UI, Microsoft YaHei, sans-serif";
-      ctx.fillText("颜色：热源 q'''", 12, 42);
-      ctx.fillText("黑箭头：Jz 方向与相对幅值", 12, 88);
+      ctx.fillText("颜色: 热源 q'''", 12, 42);
+      ctx.fillText("箭头: Jz 方向与相对幅值", 12, 88);
     }
     const texture = new THREE.CanvasTexture(labelCanvas);
     const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));

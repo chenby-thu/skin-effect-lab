@@ -8,17 +8,17 @@ type ModelLimitsPanelProps = {
 
 export function ModelLimitsPanel({ mode }: ModelLimitsPanelProps) {
   return (
-    <section className="panel limits-panel" aria-labelledby="limits-title">
-      <div className="panel-title">
-        <AlertTriangle size={18} />
-        <h2 id="limits-title">模型适用范围说明</h2>
-      </div>
+    <details className="panel limits-panel compact-details" aria-labelledby="limits-title">
+      <summary id="limits-title">
+        <AlertTriangle size={17} />
+        模型边界
+      </summary>
       {mode === "C" ? <p className="mode-c-note">{modeCApproximation}</p> : null}
       <div className="limits-list">
         {modelAssumptions.map((item) => (
           <div key={item}>{item}</div>
         ))}
       </div>
-    </section>
+    </details>
   );
 }

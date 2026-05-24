@@ -3,7 +3,7 @@ import { Download, FileText } from "lucide-react";
 import { LossResults } from "../physics/loss";
 import { MaterialKey } from "../physics/materials";
 import { SlabSolution } from "../physics/slabModel";
-import { buildReportMarkdown } from "../physics/teaching";
+import { buildReportMarkdown, modelBoundaryStatement } from "../physics/teaching";
 import { ValidationItem } from "../physics/validation";
 import { downloadJson, formatSci } from "../utils/format";
 
@@ -75,11 +75,11 @@ export function ExportPanel({ solution, losses, material, validations }: ExportP
       <div className="export-actions">
         <button onClick={exportParams} type="button">
           <Download size={16} />
-          导出当前参数 JSON
+          参数 JSON
         </button>
         <button onClick={exportResults} type="button">
           <Download size={16} />
-          导出数值结果 JSON
+          结果 JSON
         </button>
         <button onClick={copyReport} type="button">
           <FileText size={16} />
@@ -87,17 +87,16 @@ export function ExportPanel({ solution, losses, material, validations }: ExportP
         </button>
         <button onClick={exportReport} type="button">
           <FileText size={16} />
-          导出报告 Markdown
+          导出 Markdown
         </button>
       </div>
       {copyState !== "idle" ? (
-        <p className="tiny-note">
-          {copyState === "copied" ? "已复制 Markdown 报告素材。" : "浏览器阻止了剪贴板写入，可使用 Markdown 下载按钮。"}
-        </p>
+        <p className="tiny-note">{copyState === "copied" ? "已复制 Markdown 报告素材。" : "浏览器阻止剪贴板写入，可使用 Markdown 下载按钮。"}</p>
       ) : null}
       <p className="tiny-note">
-        Markdown 会整理当前参数、δ、a/δ、Rac/Rdc、模式解释、模型假设、校验结果和设计者自述草稿。当前 Pac' = {formatSci(losses.pac)} W/m。
+        Markdown 会按当前模式同步写入 R_ac 是否定义、涡流损耗或等效损耗说明。当前 P' = {formatSci(losses.pac)} W/m。
       </p>
+      <p className="tiny-note">{modelBoundaryStatement}</p>
     </section>
   );
 }

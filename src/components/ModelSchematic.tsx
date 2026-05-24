@@ -1,7 +1,7 @@
 export function ModelSchematic() {
   return (
-    <section className="panel schematic-panel" aria-labelledby="schematic-title">
-      <h2 id="schematic-title">截面方向示意图</h2>
+    <details className="panel schematic-panel compact-details" aria-labelledby="schematic-title">
+      <summary id="schematic-title">一维平板模型示意</summary>
       <div className="schematic-wrap">
         <svg viewBox="0 0 820 300" role="img" aria-label="一维平板模型截面示意图">
           <defs>
@@ -13,7 +13,7 @@ export function ModelSchematic() {
           <line x1="250" x2="550" y1="226" y2="226" className="schematic-dim" />
           <line x1="250" x2="250" y1="218" y2="234" className="schematic-dim" />
           <line x1="550" x2="550" y1="218" y2="234" className="schematic-dim" />
-          <text x="400" y="252" textAnchor="middle" className="schematic-label">厚度 2a，x ∈ [-a, a]</text>
+          <text x="400" y="252" textAnchor="middle" className="schematic-label">厚度 2a, x in [-a,a]</text>
 
           <line x1="400" x2="550" y1="42" y2="42" className="schematic-dim" />
           <line x1="400" x2="400" y1="34" y2="50" className="schematic-dim" />
@@ -34,9 +34,9 @@ export function ModelSchematic() {
 
           <path d="M270 116 C330 94, 470 94, 530 116" className="schematic-field" />
           <path d="M270 177 C330 197, 470 197, 530 177" className="schematic-field" />
-          <text x="410" y="282" textAnchor="middle" className="schematic-label schematic-note">本模型只解析厚度方向上的一维分布</text>
+          <text x="410" y="282" textAnchor="middle" className="schematic-label schematic-note">只解析厚度方向的一维分布</text>
         </svg>
       </div>
-    </section>
+    </details>
   );
 }

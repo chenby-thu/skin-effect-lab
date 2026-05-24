@@ -2,6 +2,8 @@ import { lazy, Suspense, useMemo, useState } from "react";
 import { AnimationPanel } from "./components/AnimationPanel";
 import { ControlPanel } from "./components/ControlPanel";
 import { DerivationPanel } from "./components/DerivationPanel";
+import { DisplayModePanel } from "./components/DisplayModePanel";
+import { DisplayOptions } from "./components/displayTypes";
 import { ExportPanel } from "./components/ExportPanel";
 import { FieldPlots } from "./components/FieldPlots";
 import { HeatMap } from "./components/HeatMap";
@@ -49,25 +51,27 @@ const sanitizeInput = (input: ModelInput): ModelInput => ({
 
 function ExplanationPanel() {
   return (
-    <section className="panel">
-      <h2>物理解释</h2>
+    <details className="panel compact-details">
+      <summary>公式与假设</summary>
       <div className="explain-grid">
-        <p>集肤效应不是“电流突然只在表面流”，而是磁扩散方程导致的连续分布。</p>
-        <p>趋肤深度 δ 是幅值下降到 1/e 的特征深度，同时相位也会随深度滞后。</p>
-        <p>交流电阻不是预先给定的电路参数，而是由 J(x) 分布导致的损耗积分决定。</p>
-        <p>同一个扩散方程，不同边界条件可以对应端子注入电流的集肤效应、外加磁场的涡流、外界磁场扰动下的一维邻近效应。</p>
-        <p>模式 C 用一维外加磁场扰动模拟邻近导体影响，只用于观察左右不对称分布，不等同于完整多导体仿真。</p>
-        <p>强集肤近似不能滥用，必须检查 a/δ 是否足够大。</p>
-        <p>高 μ 或高 σ 会让 δ 变小，磁场更难进入导体，集肤效应更强。</p>
+        <p>集肤效应来自磁扩散方程导致的连续电流重分布。</p>
+        <p>delta 是磁场和电流幅值衰减的特征深度，强集肤时主要变化集中在少数几个 delta 内。</p>
+        <p>模式 A 的 R_ac 由 P'=b/sigma ∫|J_rms|^2 dx 与 I_rms^2 定义。</p>
+        <p>模式 B 无端子净传输电流，只报告涡流损耗；模式 C 报告等效损耗和外场扰动趋势。</p>
       </div>
-    </section>
+    </details>
   );
 }
 
 export default function App() {
   const [material, setMaterial] = useState<MaterialKey>("copper");
   const [input, setInput] = useState<ModelInput>(defaultInput);
-  const [normalized, setNormalized] = useState(false);
+  const [display, setDisplay] = useState<DisplayOptions>({
+    viewMode: "both",
+    scaleMode: "linear",
+    amplitudeMode: "absolute",
+    surfaceSide: "both",
+  });
   const [showLimits, setShowLimits] = useState(true);
   const [phaseFraction, setPhaseFraction] = useState(0);
 
@@ -102,6 +106,11 @@ export default function App() {
     );
     setShowLimits(true);
     setPhaseFraction(0);
+    setDisplay((previous) => ({
+      ...previous,
+      viewMode: scenario.id === "strong-skin" || scenario.id === "high-mu" ? "both" : previous.viewMode,
+      surfaceSide: "both",
+    }));
   };
 
   return (
@@ -109,8 +118,8 @@ export default function App() {
       <header className="hero">
         <div>
           <span className="course-tag">电磁场课程可视化微作品</span>
-          <h1>从磁扩散方程到交流电阻</h1>
-          <p>集肤效应、涡流与邻近效应的一维可视化</p>
+          <h1>从磁扩散到交流损耗</h1>
+          <p>集肤效应、涡流损耗与外磁场扰动的一维实验台</p>
         </div>
       </header>
 
@@ -121,22 +130,21 @@ export default function App() {
             <ControlPanel
               input={safeInput}
               material={material}
-              normalized={normalized}
               showLimits={showLimits}
               phaseFraction={phaseFraction}
               onInputChange={handleInputChange}
               onMaterialChange={handleMaterialChange}
-              onNormalizedChange={setNormalized}
               onShowLimitsChange={setShowLimits}
               onPhaseChange={setPhaseFraction}
             />
+            <DisplayModePanel options={display} onChange={(next) => setDisplay((previous) => ({ ...previous, ...next }))} />
           </>
         }
       >
-        <PhysicsFlow />
+        <PhysicsFlow solution={solution} losses={losses} />
         <SkinDepthIndicator solution={solution} losses={losses} />
         <ResistancePanel solution={solution} losses={losses} showLimits={showLimits} />
-        <FieldPlots solution={solution} losses={losses} curve={curve} normalized={normalized} />
+        <FieldPlots solution={solution} losses={losses} curve={curve} display={display} />
         <div className="visual-grid">
           <Suspense
             fallback={
@@ -148,8 +156,10 @@ export default function App() {
           >
             <ThreeScenePanel solution={solution} />
           </Suspense>
-          <AnimationPanel solution={solution} normalized={normalized} />
-          <HeatMap solution={solution} />
+          <div className="visual-side-stack">
+            <AnimationPanel solution={solution} normalized={display.amplitudeMode === "normalized"} />
+            <HeatMap solution={solution} />
+          </div>
         </div>
         <ModelSchematic />
         <DerivationPanel />

@@ -9,8 +9,8 @@ export function AnimationPanel({ solution, normalized }: AnimationPanelProps) {
   const maxAbs = Math.max(...solution.points.map((point) => Math.abs(point.instantJ)), 1e-30);
   const data = solution.points.map((point) => ({ x: point.xOverA, y: normalized ? point.instantJ / maxAbs : point.instantJ }));
   const width = 720;
-  const height = 210;
-  const pad = { left: 54, right: 16, top: 24, bottom: 34 };
+  const height = 170;
+  const pad = { left: 54, right: 16, top: 20, bottom: 30 };
   const yVals = data.map((point) => point.y);
   const rawMin = Math.min(...yVals, -1);
   const rawMax = Math.max(...yVals, 1);
@@ -24,8 +24,8 @@ export function AnimationPanel({ solution, normalized }: AnimationPanelProps) {
 
   return (
     <section className="panel">
-      <h2>瞬时分布图</h2>
-      <p className="panel-subtitle">Jz(x,t) = Re&#123;Jz(x) exp(j2πt/T)&#125;</p>
+      <h2>瞬时分布</h2>
+      <p className="panel-subtitle">Jz(x,t) = Re&#123;Jz(x) exp(j 2*pi t/T)&#125;</p>
       <svg className="wide-plot" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="电流密度瞬时分布">
         <rect x="0" y="0" width={width} height={height} className="plot-bg" />
         <line x1={pad.left} x2={width - pad.right} y1={height - pad.bottom} y2={height - pad.bottom} className="axis" />

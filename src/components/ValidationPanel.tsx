@@ -27,7 +27,7 @@ export function ValidationPanel({ items }: ValidationPanelProps) {
             {icon[item.status]}
             <strong>{item.label}</strong>
             <span>
-              <b>{statusText[item.status]}：</b>
+              <b>{statusText[item.status]}: </b>
               {item.detail}
             </span>
           </div>

@@ -22,6 +22,8 @@ export const abs = (a: Complex): number => Math.hypot(a.re, a.im);
 export const arg = (a: Complex): number => Math.atan2(a.im, a.re);
 
 export const exp = (a: Complex): Complex => {
+  if (a.re > 700) return C(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+  if (a.re < -745) return C(0, 0);
   const er = Math.exp(a.re);
   return C(er * Math.cos(a.im), er * Math.sin(a.im));
 };
@@ -37,3 +39,5 @@ export const fromPolar = (r: number, theta: number): Complex =>
 
 export const conj = (a: Complex): Complex => C(a.re, -a.im);
 export const isFiniteComplex = (a: Complex): boolean => Number.isFinite(a.re) && Number.isFinite(a.im);
+
+export const finiteOrZero = (a: Complex): Complex => (isFiniteComplex(a) ? a : C(0, 0));

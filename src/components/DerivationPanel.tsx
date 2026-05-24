@@ -1,25 +1,25 @@
 const sections = [
   {
-    title: "1. 从 Maxwell 子集到磁扩散方程",
-    formulas: ["∇×H = J", "∇×E = -∂B/∂t", "J = σE", "B = μH", "∇²H = μσ ∂H/∂t"],
-    note: "变化磁场产生有旋感应电场，感应电场驱动传导电流，传导电流又反过来改变磁场分布，因此时变磁场在导体中表现为扩散。",
+    title: "1. Maxwell 子集",
+    formulas: ["curl H = J", "curl E = -dB/dt", "J = sigma E", "B = mu H"],
+    note: "时变磁场诱导电场，导体中的传导电流反过来改变磁场分布。",
   },
   {
-    title: "2. 一维正弦稳态",
-    formulas: ["d²H_y/dx² - Γ²H_y = 0", "Γ = √(jωμσ) = (1+j)/δ", "δ = √(2/(ωμσ))"],
-    note: "δ 表示场幅值衰减到表面值 1/e 的特征深度，是集肤效应的核心尺度。",
+    title: "2. 一维磁扩散",
+    formulas: ["d^2 H_y/dx^2 - Gamma^2 H_y = 0", "Gamma = sqrt(j omega mu sigma) = (1+j)/delta", "delta = sqrt(2/(omega mu sigma))"],
+    note: "delta 是幅值衰减的特征深度，也是判断集肤强弱的核心尺度。",
   },
   {
-    title: "3. 从场量回到电路量",
-    formulas: ["J_z = dH_y/dx", "q''' = |J_rms|² / σ", "P_ac' = b/σ ∫ |J_rms|² dx", "R_ac' = P_ac' / I_rms²", "R_dc' = 1/(σ·2ab)"],
-    note: "交流电阻不是凭空增加的参数，而是非均匀 J(x) 导致的总损耗增加。",
+    title: "3. 从场到损耗",
+    formulas: ["J_z = dH_y/dx", "q''' = |J_rms|^2 / sigma", "P' = b/sigma ∫ |J_rms|^2 dx", "R_ac' = P'/I_rms^2"],
+    note: "端子交流电阻只在有端子净电流的模式下定义；模式 B 应报告涡流损耗。",
   },
 ];
 
 export function DerivationPanel() {
   return (
-    <section className="panel derivation-panel" aria-labelledby="derivation-title">
-      <h2 id="derivation-title">公式推导链条</h2>
+    <details className="panel derivation-panel compact-details" aria-labelledby="derivation-title">
+      <summary id="derivation-title">推导链条</summary>
       <div className="derivation-grid">
         {sections.map((section) => (
           <article className="derivation-card" key={section.title}>
@@ -33,6 +33,6 @@ export function DerivationPanel() {
           </article>
         ))}
       </div>
-    </section>
+    </details>
   );
 }

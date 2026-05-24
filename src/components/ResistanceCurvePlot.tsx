@@ -22,7 +22,6 @@ const tickValues = (xMin: number, xMax: number): number[] => {
 export function ResistanceCurvePlot({ solution, losses, curve }: ResistanceCurvePlotProps) {
   const ratio = solution.input.a / solution.delta;
   const mode = solution.input.mode;
-  const hasEquivalent = losses.racOverRdc !== null;
   const isPureAMode = mode === "A" && Math.abs(solution.input.h0) < 1e-12 && solution.input.current > 0;
   const referenceValue = interpolateResistanceCurve(curve, ratio);
   const relativeCurveError =
@@ -43,7 +42,7 @@ export function ResistanceCurvePlot({ solution, losses, curve }: ResistanceCurve
     .map((point, index) => `${index === 0 ? "M" : "L"} ${sx(point.ratio).toFixed(2)} ${sy(point.value).toFixed(2)}`)
     .join(" ");
   const currentX = sx(ratio);
-  const currentY = hasEquivalent ? sy(losses.racOverRdc ?? 0) : null;
+  const currentY = losses.racOverRdc !== null ? sy(losses.racOverRdc) : null;
   const markerVisible =
     currentY !== null &&
     Number.isFinite(currentX) &&
@@ -51,15 +50,8 @@ export function ResistanceCurvePlot({ solution, losses, curve }: ResistanceCurve
     currentX >= pad.left - 0.1 &&
     currentX <= width - pad.right + 0.1;
 
-  const title =
-    mode === "A" ? "交流电阻随 a/δ 的变化" : mode === "C" ? "等效损耗电阻参考" : "涡流损耗模式";
-  const subtitle =
-    mode === "A"
-      ? "纯 A 模式"
-      : mode === "C"
-        ? "P/I²/Rdc"
-        : "R_ac 不定义";
-  const yLabel = mode === "C" ? "Req/Rdc" : "Rac/Rdc";
+  const title = mode === "A" ? "纯集肤 R_ac/R_dc 曲线" : mode === "C" ? "纯 A 曲线参考" : "涡流损耗模式";
+  const subtitle = mode === "A" ? "当前点应在线上" : mode === "C" ? "当前点为等效损耗" : "R_ac 不定义";
 
   return (
     <article className="plot-card resistance-curve-card">
@@ -69,7 +61,8 @@ export function ResistanceCurvePlot({ solution, losses, curve }: ResistanceCurve
       </div>
       {mode === "B" ? (
         <div className="plot-message">
-          模式 B 无端子净传输电流，因此 R_ac=P/I² 不定义。此处应关注外加磁场诱发的涡流损耗 P_ac'。
+          <strong>无端子电流，不定义端子交流电阻。</strong>
+          <span>请看 P_eddy'、q'''_max、表面/中心热源比与 I_net≈0 校验。</span>
         </div>
       ) : (
         <>
@@ -92,29 +85,36 @@ export function ResistanceCurvePlot({ solution, losses, curve }: ResistanceCurve
                 </g>
               );
             })}
-            <path d={path} fill="none" stroke="#5c2d91" strokeWidth={mode === "C" ? "2" : "2.6"} strokeDasharray={mode === "C" ? "5 5" : undefined} />
+            <path d={path} fill="none" stroke="#5c2d91" strokeWidth="2.4" strokeDasharray={mode === "C" ? "5 5" : undefined} />
             {markerVisible ? (
               <g>
                 <line x1={currentX} x2={currentX} y1={pad.top} y2={height - pad.bottom} className="marker-line" />
-                <circle cx={currentX} cy={currentY} r="5.5" className="marker-dot" />
+                {mode === "C" ? (
+                  <path
+                    d={`M ${currentX} ${currentY - 6} L ${currentX + 6} ${currentY} L ${currentX} ${currentY + 6} L ${currentX - 6} ${currentY} Z`}
+                    className="marker-diamond"
+                  />
+                ) : (
+                  <circle cx={currentX} cy={currentY} r="5.5" className="marker-dot" />
+                )}
               </g>
             ) : null}
             <text x={(pad.left + width - pad.right) / 2} y={height - 2} textAnchor="middle" className="axis-label">
-              a/δ
+              a/delta
             </text>
             <text x={14} y={(height - pad.bottom + pad.top) / 2} textAnchor="middle" className="axis-label rotate-label">
-              {yLabel}
+              R/Rdc
             </text>
           </svg>
           <p className="plot-note">
             {mode === "C"
-              ? "虚线是 h0=0 的纯 A 模式参考基线；当前点为等效损耗电阻，包含外加磁场涡流损耗和交叉项，不应与纯 A 模式曲线重合。"
-              : `当前 a/δ = ${formatSci(ratio, 3)}，曲线按同一纯 A 模式定义动态扩展。`}
+              ? "模式 C 当前点为等效损耗，含外场诱发涡流与端子电流叠加；偏离纯 A 曲线是物理结果。"
+              : `当前 a/delta = ${formatSci(ratio, 3)}。曲线与当前点使用同一 P'=b/sigma ∫|J|^2 dx 定义。`}
           </p>
           {shouldWarn ? (
             <p className="plot-warning">
               <AlertTriangle size={14} />
-              当前纯 A 点与曲线插值相差 {(relativeCurveError * 100).toFixed(1)}%，可能是采样不足或曲线范围/定义不一致。
+              当前纯 A 点与曲线插值相差 {(relativeCurveError * 100).toFixed(1)}%，请检查采样或参数范围。
             </p>
           ) : null}
         </>

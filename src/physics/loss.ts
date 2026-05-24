@@ -11,35 +11,44 @@ export type LossResults = {
   inetAbs: number;
   inetRe: number;
   inetIm: number;
+  maxHeatDensity: number;
   surfaceHeatRatio: number;
   maxCurrentPosition: number;
   maxCurrentDensity: number;
   centerHeat: number;
   surfaceHeat: number;
+  asymmetryIndex: number;
+  racDefined: boolean;
 };
 
 export const integrateComplexJ = (solution: SlabSolution) => {
-  const xs = solution.points.map((point) => point.x);
-  const re = trapezoid(xs, solution.points.map((point) => point.jz.re)) * solution.input.b;
-  const im = trapezoid(xs, solution.points.map((point) => point.jz.im)) * solution.input.b;
+  const points = solution.integrationPoints ?? solution.points;
+  const xs = points.map((point) => point.x);
+  const re = trapezoid(xs, points.map((point) => point.jz.re)) * solution.input.b;
+  const im = trapezoid(xs, points.map((point) => point.jz.im)) * solution.input.b;
   return { re, im, abs: Math.hypot(re, im) };
 };
 
 export const computeLosses = (solution: SlabSolution): LossResults => {
   const input = solution.input;
-  const xs = solution.points.map((point) => point.x);
-  const heatIntegral = trapezoid(xs, solution.points.map((point) => point.jAbs * point.jAbs));
+  const points = solution.integrationPoints ?? solution.points;
+  const xs = points.map((point) => point.x);
+  const heatIntegral = trapezoid(xs, points.map((point) => point.jAbs * point.jAbs));
   const pac = (input.b / input.sigma) * heatIntegral;
   const rdc = 1 / (input.sigma * 2 * input.a * input.b);
-  const rac = input.current > 0 ? pac / (input.current * input.current) : null;
+  const racDefined = input.mode !== "B" && input.current > TINY;
+  const rac = racDefined ? pac / (input.current * input.current) : null;
   const racOverRdc = rac === null ? null : rac / rdc;
   const inet = integrateComplexJ(solution);
 
-  const leftHeat = solution.points[0]?.heat ?? 0;
-  const rightHeat = solution.points[solution.points.length - 1]?.heat ?? 0;
+  const leftHeat = points[0]?.heat ?? 0;
+  const rightHeat = points[points.length - 1]?.heat ?? 0;
   const surfaceHeat = Math.max(leftHeat, rightHeat);
-  const center = solution.points[Math.floor(solution.points.length / 2)]?.heat ?? 0;
-  const maxPoint = solution.points.reduce((best, point) => (point.jAbs > best.jAbs ? point : best), solution.points[0]);
+  const centerPoint = points.reduce((best, point) => (Math.abs(point.x) < Math.abs(best.x) ? point : best), points[0]);
+  const center = centerPoint?.heat ?? 0;
+  const maxPoint = points.reduce((best, point) => (point.jAbs > best.jAbs ? point : best), points[0]);
+  const maxHeatDensity = points.reduce((best, point) => Math.max(best, point.heat), 0);
+  const asymmetryIndex = computeAsymmetryIndex(points);
 
   return {
     rdc,
@@ -49,12 +58,28 @@ export const computeLosses = (solution: SlabSolution): LossResults => {
     inetAbs: inet.abs,
     inetRe: inet.re,
     inetIm: inet.im,
+    maxHeatDensity,
     surfaceHeatRatio: surfaceHeat / Math.max(center, TINY),
     maxCurrentPosition: maxPoint.x,
     maxCurrentDensity: maxPoint.jAbs,
     centerHeat: center,
     surfaceHeat,
+    asymmetryIndex,
+    racDefined,
   };
+};
+
+const computeAsymmetryIndex = (points: SlabSolution["points"]): number => {
+  let numerator = 0;
+  let denominator = 0;
+  const n = points.length;
+  for (let index = 0; index < Math.floor(n / 2); index += 1) {
+    const left = points[index]?.jAbs ?? 0;
+    const right = points[n - 1 - index]?.jAbs ?? 0;
+    numerator = Math.max(numerator, Math.abs(left - right));
+    denominator = Math.max(denominator, left, right);
+  }
+  return numerator / Math.max(denominator, TINY);
 };
 
 export const currentBalanceError = (solution: SlabSolution): number => {
@@ -86,7 +111,7 @@ export const buildResistanceCurve = (currentRatio?: number, samples = 160): Resi
         current: 1,
         h0: 0,
         mode: "A",
-        samples: 300,
+        samples: 360,
       },
       0,
     );
